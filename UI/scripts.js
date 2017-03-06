@@ -188,25 +188,34 @@ function getArticles(skip,top,filterConfig){
 	if(skip===undefined)
 		skip=0;
 	if(top===undefined)
-		top=0;
+		top=10;
 
-	var newArr = articles;
+	var newArr = [];
 	var newArrAuthors = [];
-	if(filterConfig===undefined){
-		newArr=newArr.slice(skip,top+skip);
+	if(filterConfig==null){
+		newArr=articles.slice(skip,top+skip);
 		return 	newArr.sort(compareDate);
-	}else if(filterConfig===filterConfig.author){
-		var k=0;
-		for(i=0;i<articles.length;i++){
+	}else if(filterConfig.author!=null){
+		for(var i=0;i<articles.length;i++){
 			if(articles[i].author===filterConfig.author)
-				newArrAuthors[k++] = articles[i]; 	
+				newArrAuthors.push(articles[i]);
 		}
+		if(articles.length<top)
+			top=articles.length;
 		newArrAuthors.sort(compareDate);
 		return newArrAuthors.slice(skip,top+skip);
-	}else 
-		return undefined;
+	}else if(filterConfig.tag!=null){
+		for(var i=0;i<articles.length;i++){
+			if(articles[i].tag.indexOf(filterConfig.tag))
+				newArrAuthors.push(articles[i]);
+		}
+		if(articles.length<top)
+			top=articles.length;
+		newArrAuthors.sort(compareDate);
+		return newArrAuthors.slice(skip,top+skip);
+	}else
+	return newArr;
 }
-
 
 function compareDate(a,b){
 	return a.createdAt>b.createdAt?1:-1;
@@ -217,14 +226,25 @@ function getArticle(id){
 		if(articles[i].id==id)
 			return articles[i];
 	}
-	return undefined;
+	return null;
 }	
 
 function validateArticle(article){
+	if(article===null)
+		return false;
 	if(article.id&&article.title&&article.title.length<100&&article.summary&&article.summary.length<200&&article.createdAt&&article.author&&article.content){
-		for(i=0;i<article.tag.length;i++){
-			if(!(all_tags.indexOf(article.tag[i])+1))
-				return false;			
+		if (Object.prototype.toString.call(article.tags) !== '[object Array]' || article.tags.length == 0 || article.tags.length > 5) {
+			return false;
+		}
+		for (var i = 0; i < articles.length; i++) {
+			if (articles[i].id === article.id) {
+				return false;
+			}
+		}
+		for (var i = 0; i < article.tags.length; i++) {
+			if (all_tags.indexOf(article.tags[i]) == -1) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -240,7 +260,8 @@ function addArticle(article){
 }
 
 function editArticle(id,article){
-	var newTags = [];
+	if(article===null)
+		return false;
 	for(i=0;i<articles.length;i++){
 		if(articles[i].id==id){
 			if(article.title&&article.title.length<100){
@@ -283,3 +304,116 @@ function removeTag(tag) {
     }
     return false;
 }
+var articleToChange = {
+    author: 1234,
+    content: 'New content'
+};
+
+var filterConfig = {
+    author: 'Иванов Андрей'
+};
+var newArticle = {
+    id: '24',
+    title: 'Минское «Динамо» обыграло ярославский «Зубр»',
+    summary: 'Минское «Динамо» обыграло ярославский «Локомотив» в четвертом матче первого раунда плей-офф КХЛ — 4:2',
+    createdAt: new Date('2017-02-27T23:10:54'),
+    tags: ['USA', 'Russia'],
+    author: 'Петров Дмитрий',
+    content: 'Гости создали больше опасных моментов и в два раза перебросали минчан, но «зубры» на этот раз очень эффективно использовали свои моменты.'
+};
+
+var invalidTagsArticle = {
+    id: '30',
+    title: 'Минское «Динамо» обыграло ярославский «Зубр»',
+    summary: 'Минское «Динамо» обыграло ярославский «Локомотив» в четвертом матче первого раунда плей-офф КХЛ — 4:2',
+    createdAt: new Date('2017-02-27T23:10:54'),
+    tags: ['USA', 'Russia','KIA'],
+    author: 'Петров Дмитрий',
+    content: 'Гости создали больше опасных моментов и в два раза перебросали минчан, но «зубры» на этот раз очень эффективно использовали свои моменты.'
+};
+var validArticle = {
+    id: '30',
+    title: 'Минское «Динамо» обыграло ярославский «Зубр»',
+    summary: 'Минское «Динамо» обыграло ярославский «Локомотив» в четвертом матче первого раунда плей-офф КХЛ — 4:2',
+    createdAt: new Date('2017-02-27T23:10:54'),
+    tags: ['USA', 'Minsk'],
+    author: 'Петров Дмитрий',
+    content: 'Гости создали больше опасных моментов и в два раза перебросали минчан, но «зубры» на этот раз очень эффективно использовали свои моменты.'
+};
+
+
+function logArray(array) {
+    for (var i = 0; i < array.length; i++) {
+        console.log(array[i]);
+    }
+}
+
+console.log('\n' + "------TEST:getArticles(skip?: number, top?: number, filterConfig?: Object): Array< Object>------");
+console.log("------ALL ARTICLES:-------");
+logArray(articles);
+console.log('\n' + "------getArticles(0, 5,null)-------");
+logArray(getArticles(0, 5, null));
+console.log('\n' + "------getArticles(2, 5,null)-------");
+logArray(getArticles(2, 5, null));
+console.log('\n' + "------filterConfig-------");
+console.log(filterConfig);
+console.log('\n' + "------getArticles(0, 5,filterConfig)-------");
+logArray(getArticles(0, 5, filterConfig));
+console.log('\n' + "------getArticles(2, 5,filterConfig)-------");
+logArray(getArticles(2, 5, filterConfig));
+
+
+
+console.log('\n' + "------TEST: getArticle(id: string): Object -------");
+console.log('\n' + "------getArticles(0)-------");
+console.log(getArticle(0));
+console.log('\n' + "------getArticles(12)-------");
+console.log(getArticle(12));
+console.log('\n' + "------getArticles('Hey!')-------");
+console.log(getArticle('Hey!'));
+
+
+console.log('\n' + "------TEST: addArticle(article: Object): boolean -------");
+console.log('\n' + "------addArticles(null)-------");
+console.log(addArticle(null));
+console.log('\n' + "------addArticles('Hey!')-------");
+console.log(addArticle('Hey!'));
+console.log('\n' + "------article-------");
+console.log(newArticle);
+console.log('\n' + "------addArticles(article)-------");
+ var newArticle;
+console.log(addArticle(newArticle));
+console.log("------ALL ARTICLES:-------");
+logArray(articles);
+
+
+console.log('\n' + "------TEST: editArticle(id:string, article: Object): boolean -------");
+console.log('\n' + "------editArticle(200,articleToChange)-------");
+editArticle(200, articleToChange);
+console.log('\n' + "------editArticle(19,null)-------");
+console.log(editArticle(19, null));
+console.log(getArticle(19));
+console.log('\n' + "------editArticle(19,articleToChange)-------");
+console.log(articleToChange);
+console.log(editArticle(19, articleToChange));
+console.log(getArticle(19));
+
+console.log('\n' + "------TEST: removeArticle(id: string): boolean  -------");
+console.log('\n' + "------removeArticle(100500)-------");
+console.log(removeArticle(100500));
+console.log('\n' + "------removeArticle(24)-------");
+console.log(removeArticle(24));
+console.log("------ALL ARTICLES:-------");
+logArray(articles);
+
+console.log('\n' + "------TEST: validateArticle(article: Object): boolean   -------");
+console.log('\n' + "------validateArticle(null) -------");
+console.log(validateArticle(null));
+console.log('\n' + "------TAGS -------");
+console.log(all_tags);
+console.log('\n' + "------validateArticle(invalidTagsArticle) -------");
+console.log(validateArticle(invalidTagsArticle));
+console.log(invalidTagsArticle);
+console.log('\n' + "------validateArticle(validArticle) -------");
+console.log(validateArticle(validArticle));
+console.log(validArticle);
