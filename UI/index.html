@@ -9,7 +9,7 @@
 <body>
 <div class="relative ">
     <h1 class="header">WLNews
-        <ul class="up_buttons">
+        <ul class="up-buttons">
             <li>Politics</li>
             <li>Tech</li>
             <li>Sport</li>
@@ -17,30 +17,31 @@
     </h1>
     <div class="absolute col-5">
         <div class="log-In">
-            <img src="images/account2.png" alt="account" class="user_logo">
+            <img src="images/account2.png" alt="account" class="user-logo">
         </div>
         <p class="profile"></p>
     </div>
 </div>
-<div class="main_margin">
-    <div class="full-String ">
+<div class="main-margin">
+    <div class="full-string">
         <form>
             <button class="button1">Find!</button>
             <input type="text" name="Search" placeholder="Search..">
         </form>
     </div>
-    <div class="full-String with-Add-Button">
+    <a href="#" class="advanced-search">Advanced</a>
+    <div class="full-string">
         <form>
-            <button class="button1" class="add-news">Add news</button>
-            <button class="button1">Filter</button>
+        <button class="button1" id="add-button">Add news</button>
+        <button class="button1">Filter</button>
         </form>
-        <a href="#" class="advsearch">Advanced</a>
+
     </div>
     <div class="article-list">
     </div>
 </div>
 <div>
-    <a class="col-12 more_news" href="#">More news</a>
+    <a class="col-12 more-news" href="#">More news</a>
 </div>
 
 
@@ -54,25 +55,25 @@
 
 <template id="template-article-list-item">
     <div class="col-3 back article-list-item" data-id="id">
-        <p class="header_news article-list-item-title">
+        <p class="header-news article-list-item-title">
             title
         </p>
         <p class="center article-list-item-summary">
             summary
         </p>
         <p><a href="#" class="tags article-list-item-tags">tags </a></p>
-        <div>
-            <div class="control-buttons">
-                <a href="#"><img src="images/pen.png" alt="pen" class="icon"></a>
-                <a href="#"><img src="images/delete.png" alt="delete" class="icon"></a>
-            </div>
-            <span class="author article-list-item-date">date</span>
-            <br>
-            <span class="author article-list-item-author">Author</span>
+        <div class="control-buttons">
+            <a href="#"><img src="images/pen.png" alt="pen" class="icon"></a>
+            <a href="#"><img src="images/delete.png" alt="delete" class="icon"></a>
         </div>
+        <span class="author article-list-item-date">date</span>
+        <br>
+        <span class="author article-list-item-author">Author</span>
+
     </div>
 </template>
 
 <script src="scripts.js"></script>
+
 </body>
 </html>
