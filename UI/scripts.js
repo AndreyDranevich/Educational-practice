@@ -1,3 +1,5 @@
+var user = 'Andrew';
+
 var articlesService = (function () {
     var articles = [
         {
@@ -186,67 +188,65 @@ var articlesService = (function () {
     var all_tags = ['доллар', 'политика', 'Лукашенко', 'AЭС', 'Польша', 'экономика', 'деньги', 'Газпром', 'Минск', 'автобусы', 'Мкад-2', 'дороги'];
 
     function getArticles(skip, top, filterConfig) {
-        if (!skip)
-            skip = 0;
-        if (!top)
-            top = 10;
+        skip = skip || 0;
+        top = top || 10;
+        if (articles.length < top) {
+            top = articles.length;
+        }
 
-        var newArr = [];
-        var newArrAuthors = [];
-        if (filterConfig == null) {
-            newArr = articles.slice(skip, top + skip);
-            return newArr.sort(compareDate);
-        } else if (filterConfig.author != null) {
-            for (var i = 0; i < articles.length; i++) {
-                if (articles[i].author === filterConfig.author)
-                    newArrAuthors.push(articles[i]);
+        var newArticles = [];
+        if (filterConfig) {
+            newArticles = getArticlesByFilter(filterConfig);
+        } else {
+            newArticles = articles;
+        }
+        newArticles.sort(compareDate);
+
+        return newArticles.slice(skip, skip + top);
+    }
+
+    function getArticlesByFilter(filterConfig) {
+        var filteredArray = [];
+        for (var i = 0; i < articles.length; i++) {
+            if (filterConfig.dateStart && filterConfig.dateFinish) {
+                if (compareDate(filterConfig.dateStart, articles[i].createdAt) && compareDate(articles[i].createdAt, filterConfig.dateFinish)) {
+                    filteredArray.push(articles[i]);
+                }
             }
-            if (articles.length < top)
-                top = articles.length;
-            newArrAuthors.sort(compareDate);
-            return newArrAuthors.slice(skip, top + skip);
-        } else if (filterConfig.tag != null) {
-            for (var i = 0; i < articles.length; i++) {
-                if (articles[i].tag.indexOf(filterConfig.tag))
-                    newArrAuthors.push(articles[i]);
+            if (filterConfig.author) {
+                if (articles[i].author === filterConfig.author) {
+                    filteredArray.push(articles[i]);
+                }
             }
-            if (articles.length < top)
-                top = articles.length;
-            newArrAuthors.sort(compareDate);
-            return newArrAuthors.slice(skip, top + skip);
-        } else
-            return newArr;
+            if (filterConfig.tag) {
+                for (var j = 0; j < filterConfig.tag.length; j++) {
+                    if (articles[i].tag.indexOf(filterConfig.tag[j]) != -1) {
+                        filteredArray.push(articles[i]);
+                    }
+                }
+            }
+        }
+        return filteredArray;
     }
 
     function compareDate(a, b) {
-        return a.createdAt > b.createdAt ? 1 : -1;
+        return a.createdAt > b.createdAt ? -1 : 1;
     }
 
     function getArticle(id) {
         for (var i = 0; i < articles.length; i++) {
-            if (articles[i].id == id)
+            if (articles[i].id == id) {
                 return articles[i];
+            }
         }
         return null;
     }
 
     function validateArticle(article) {
-        if (article === null)
+        if (!article) {
             return false;
+        }
         if (article.id && article.title && article.title.length < 100 && article.summary && article.summary.length < 200 && article.createdAt && article.author && article.content) {
-            if (Object.prototype.toString.call(article.tags) !== '[object Array]' || article.tags.length == 0 || article.tags.length > 5) {
-                return false;
-            }
-            for (var i = 0; i < articles.length; i++) {
-                if (articles[i].id === article.id) {
-                    return false;
-                }
-            }
-            for (var i = 0; i < article.tags.length; i++) {
-                if (all_tags.indexOf(article.tags[i]) == -1) {
-                    return false;
-                }
-            }
             return true;
         }
         return false;
@@ -255,14 +255,16 @@ var articlesService = (function () {
     function addArticle(article) {
         if (validateArticle(article)) {
             articles.splice(articles.length, 0, article);
+            fillArticlesStorage();
             return true;
         }
         return false;
     }
 
     function editArticle(id, article) {
-        if (article === null)
+        if (!article) {
             return false;
+        }
         for (var i = 0; i < articles.length; i++) {
             if (articles[i].id == id) {
                 if (article.title && article.title.length < 100) {
@@ -271,8 +273,10 @@ var articlesService = (function () {
                 if (article.summary && article.summary.length < 200) {
                     articles[i].summary = article.summary;
                 }
-                if (article.content)
+                if (article.content) {
                     articles[i].content = article.content;
+                }
+                fillArticlesStorage();
                 return true;
             }
         }
@@ -284,9 +288,11 @@ var articlesService = (function () {
         for (var i = 0; i < articles.length; i++) {
             if (articles[i].id == id) {
                 articles.splice(i, 1);
+                fillArticlesStorage();
                 return true;
             }
         }
+
         return false;
     }
 
@@ -306,6 +312,42 @@ var articlesService = (function () {
         return false;
     }
 
+    function getArticlesSize() {
+        return articles.length;
+    }
+
+    function getNullArticle() {
+        var nullArticle = {
+            id: '',
+            title: '',
+            summary: '',
+            createdAt: '',
+            tag: '',
+            author: '',
+            content: ''
+        };
+        return nullArticle;
+    }
+
+    function fillArticlesStorage() {
+        localStorage.clear('articlesKey');
+        localStorage.setItem('articlesKey', JSON.stringify(articles));
+    }
+
+    var articlesData = JSON.parse(localStorage.getItem('articlesKey'));
+    if (!articlesData)
+        fillArticlesStorage();
+    else {
+        articles = articlesData;
+        articles.forEach(function (currentElement) {
+            currentElement.createdAt = new Date(currentElement.createdAt);
+        });
+    }
+
+    window.beforeunload = function () {
+        localStorage.setItem('articlesKey', JSON.stringify(articles));
+    };
+
     return {
         getArticle: getArticle,
         getArticles: getArticles,
@@ -314,7 +356,9 @@ var articlesService = (function () {
         editArticle: editArticle,
         removeArticle: removeArticle,
         addTag: addTag,
-        removeTag: removeTag
+        removeTag: removeTag,
+        getArticlesSize: getArticlesSize,
+        getNullArticle: getNullArticle
     }
 }());
 
@@ -323,7 +367,6 @@ var articlesService = (function () {
  author: 1234,
  content: 'New content'
  };
-
  var filterConfig = {
  author: 'Иванов Андрей'
  };
@@ -336,7 +379,6 @@ var articlesService = (function () {
  author: 'Петров Дмитрий',
  content: 'Гости создали больше опасных моментов и в два раза перебросали минчан, но «зубры» на этот раз очень эффективно использовали свои моменты.'
  };
-
  var invalidTagsArticle = {
  id: '30',
  title: 'Минское «Динамо» обыграло ярославский «Зубр»',
@@ -355,14 +397,11 @@ var articlesService = (function () {
  author: 'Петров Дмитрий',
  content: 'Гости создали больше опасных моментов и в два раза перебросали минчан, но «зубры» на этот раз очень эффективно использовали свои моменты.'
  };
-
-
  function logArray(array) {
  for (var i = 0; i < array.length; i++) {
  console.log(array[i]);
  }
  }
-
  console.log('\n' + "------TEST:getArticles(skip?: number, top?: number, filterConfig?: Object): Array< Object>------");
  console.log("------ALL ARTICLES:-------");
  logArray(articles);
@@ -376,9 +415,6 @@ var articlesService = (function () {
  logArray(getArticles(0, 5, filterConfig));
  console.log('\n' + "------getArticles(2, 5,filterConfig)-------");
  logArray(getArticles(2, 5, filterConfig));
-
-
-
  console.log('\n' + "------TEST: getArticle(id: string): Object -------");
  console.log('\n' + "------getArticles(0)-------");
  console.log(getArticle(0));
@@ -386,8 +422,6 @@ var articlesService = (function () {
  console.log(getArticle(12));
  console.log('\n' + "------getArticles('Hey!')-------");
  console.log(getArticle('Hey!'));
-
-
  console.log('\n' + "------TEST: addArticle(article: Object): boolean -------");
  console.log('\n' + "------addArticles(null)-------");
  console.log(addArticle(null));
@@ -400,8 +434,6 @@ var articlesService = (function () {
  console.log(addArticle(newArticle));
  console.log("------ALL ARTICLES:-------");
  logArray(articles);
-
-
  console.log('\n' + "------TEST: editArticle(id:string, article: Object): boolean -------");
  console.log('\n' + "------editArticle(200,articleToChange)-------");
  editArticle(200, articleToChange);
@@ -412,7 +444,6 @@ var articlesService = (function () {
  console.log(articleToChange);
  console.log(editArticle(19, articleToChange));
  console.log(getArticle(19));
-
  console.log('\n' + "------TEST: removeArticle(id: string): boolean  -------");
  console.log('\n' + "------removeArticle(100500)-------");
  console.log(removeArticle(100500));
@@ -420,7 +451,6 @@ var articlesService = (function () {
  console.log(removeArticle(24));
  console.log("------ALL ARTICLES:-------");
  logArray(articles);
-
  console.log('\n' + "------TEST: validateArticle(article: Object): boolean   -------");
  console.log('\n' + "------validateArticle(null) -------");
  console.log(validateArticle(null));
@@ -434,18 +464,54 @@ var articlesService = (function () {
  console.log(validArticle);
  */
 
-var user = "Andrew";
+var filterConfig = {
+    author: 'name',
+    dateStart: 10,
+    dateFinish: 12,
+    tag: ['df', 'hello']
+};
 
 var articleRenderer = (function () {
     var ARTICLE_TEMPLATE;
+    var LOG_TEMPLATE;
+    var DETAILED_ARTICLE_TEMPLATE;
+    var EDIT_TEMPLATE;
+    var FILTER_TEMPLATE;
+    var ERROR_TEMPLATE;
+
     var ARTICLE_LIST_NODE;
+    var CONTENT;
+    var controlPanel;
+    var logNode;
+    var blockWithSearch;
+    var editOrAddArticle;
+
+    var isOpenFilter = false;
+    var isItError = false;
+    var deletedFilter;
+    var deletedAddButton;
+    var deletedControlButtons;
+    var deletedBlockSearch;
+    var deletedMoreNews;
 
     function init() {
         ARTICLE_TEMPLATE = document.querySelector('#template-article-list-item');
+        LOG_TEMPLATE = document.querySelector('#template-log');
+        DETAILED_ARTICLE_TEMPLATE = document.querySelector('#template-detailed-news');
+        EDIT_TEMPLATE = document.querySelector('#template-edit');
+        FILTER_TEMPLATE = document.querySelector('#template-filter');
+        ERROR_TEMPLATE = document.querySelector('#template-error');
+
         ARTICLE_LIST_NODE = document.querySelector('.article-list');
+        CONTENT = document.querySelector('.content');
+        logNode = document.querySelector(".log-item");
+        deletedControlButtons = document.querySelector('.control-buttons');
+        controlPanel = document.querySelector('.control-panel-2');
+        blockWithSearch = document.querySelector('.block-with-search');
     }
 
     function insertArticlesInDom(articles) {
+        loadUser(user);
         var articlesNodes = renderArticles(articles);
         articlesNodes.forEach(function (node) {
             ARTICLE_LIST_NODE.appendChild(node);
@@ -463,13 +529,21 @@ var articleRenderer = (function () {
         renderArticles();
     }
 
-
     function removeArticlesFromDom() {
         ARTICLE_LIST_NODE.innerHTML = '';
     }
 
     function removeArticleFromDom(id) {
         articlesService.removeArticle(id);
+
+        removeArticlesFromDom();
+        var articles = articlesService.getArticles(0, 10);
+        insertArticlesInDom(articles);
+    }
+
+    function removeArticleFromDomFromDetailed(id) {
+        articlesService.removeArticle(id);
+        insertMain();
     }
 
     function renderArticles(articles) {
@@ -487,18 +561,13 @@ var articleRenderer = (function () {
         template.content.querySelector('.article-list-item-tags').textContent = article.tag;
         template.content.querySelector('.article-list-item-date').textContent = formatDate(article.createdAt);
 
-        if (user == null) {
-            var controlButtons = template.content.querySelector(".control-buttons");
-            document.querySelector(".log-In").lastElementChild.src = "images/no-logo.jpg";
-            document.querySelector(".profile").textContent = "Hello, guest!";
-            var addPostButton = document.getElementById("add-button");
-
+        var controlButtons = template.content.querySelector(".control-buttons");
+        if (!user) {
             if (controlButtons) {
-                addPostButton.parentNode.removeChild(addPostButton);
-                template.content.querySelector(".article-list-item").removeChild(controlButtons);
+                deletedControlButtons = template.content.querySelector(".block-of-buttons").removeChild(controlButtons);
             }
-        } else {
-            document.querySelector(".profile").textContent = "Hello, " + user + "!";
+        } else if (deletedControlButtons) {
+            template.content.querySelector('.block-of-buttons').appendChild(deletedControlButtons);
         }
         return template.content.querySelector('.article-list-item').cloneNode(true);
     }
@@ -507,42 +576,397 @@ var articleRenderer = (function () {
         return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear();
     }
 
+    function loadUser(user) {
+        var addArticleButton = document.getElementById("add-button");
+        if (user) {
+            document.querySelector(".profile").textContent = "Привет, " + user + "!";
+            document.querySelector(".log-in-action").textContent = "Выход";
+            if (deletedAddButton) {
+                controlPanel.appendChild(deletedAddButton);
+                deletedAddButton = null;
+            }
+        } else {
+            document.querySelector(".log-In").lastElementChild.src = "images/no-logo.jpg";
+            document.querySelector(".profile").textContent = "Привет, гость!";
+            document.querySelector(".log-in-action").textContent = "Вход";
+            if (addArticleButton) {
+                deletedAddButton = addArticleButton.parentNode.removeChild(addArticleButton);
+            }
+        }
+    }
+
+    function insertLogin() {
+        removeArticlesFromDom();
+        deleteFilter();
+        if (user) {
+            user = null;
+            document.querySelector('.more-news');
+            insertMain();
+        } else {
+            if (document.getElementById('more-news')) {
+                deletedMoreNews = CONTENT.removeChild(document.getElementById('more-news'));
+                deletedBlockSearch = blockWithSearch.removeChild(controlPanel);
+            }
+            document.querySelector(".log-in-action").textContent = '';
+            logNode.appendChild(LOG_TEMPLATE.content.querySelector(".log-list-item").cloneNode(true));
+        }
+    }
+
+    function logIn() {
+        var inputName = document.querySelector('.name-event').value;
+        var inputPassword = document.querySelector('.password-event').value;
+
+        if (isCorrectLogin(inputName, inputPassword)) {
+            user = inputName;
+            loadUser(user);
+            logNode.removeChild(document.querySelector('.log-list-item'));
+            insertMain();
+        } else {
+            document.querySelector('.name-event').value = "";
+            document.querySelector('.password-event').value = "";
+            alert('Попробуйте еще раз.');
+        }
+    }
+
+    function isCorrectLogin(name, password) {
+        return (name === 'admin' && password === "admin");
+    }
+
+    function insertMain() {
+        if (deletedMoreNews) {
+            blockWithSearch.appendChild(deletedBlockSearch);
+            CONTENT.appendChild(deletedMoreNews);
+        }
+        if (isItError) {
+            logNode.removeChild(document.querySelector('.error-img'));
+            isItError = false;
+        }
+
+        deleteFilter();
+        removeArticlesFromDom();
+        startAppSecond();
+    }
+
+    function insertMainAfterLog() {
+        insertMain();
+
+        if (document.querySelector('.log-list-item')) {
+            logNode.removeChild(document.querySelector('.log-list-item'));
+        }
+    }
+
+    function deleteMain() {
+        removeArticlesFromDom();
+        if (document.getElementById('more-news')) {
+            deletedMoreNews = CONTENT.removeChild(document.getElementById('more-news'));
+            deletedBlockSearch = blockWithSearch.removeChild(controlPanel);
+        }
+    }
+
+    function insertDetailedArticle(articleID, flag) {
+        flag = flag || 0;
+        removeArticlesFromDom();
+        console.log(articleID);
+        var article = articlesService.getArticle(articleID);
+        console.log(article);
+        var detailedTemp = DETAILED_ARTICLE_TEMPLATE;
+
+        detailedTemp.content.querySelector('.detailed-news').dataset.id = article.id;
+        detailedTemp.content.querySelector('.header-news-detailed').textContent = article.title;
+        detailedTemp.content.querySelector('.detailed-content').textContent = article.content;
+        detailedTemp.content.querySelector('.detailed-author').textContent = article.author;
+        detailedTemp.content.querySelector('.tags-detailed-news').textContent = article.tag;
+        detailedTemp.content.querySelector('.detailed-time').textContent = formatDate(article.createdAt);
+
+        ARTICLE_LIST_NODE.appendChild(detailedTemp.content.querySelector('.detailed-news').cloneNode(true));
+
+        if (!user) {
+            document.querySelector('.detailed-edit-del').removeChild(document.getElementById('del-edit-icon'));
+        }
+
+        deleteFilter();
+        if (flag === 0) {
+            deletedMoreNews = CONTENT.removeChild(document.getElementById('more-news'));
+            deletedBlockSearch = blockWithSearch.removeChild(controlPanel);
+        }
+    }
+
+    function insertEditFormArticle(id) {
+        deleteMain();
+        deleteFilter();
+        var editTemp = EDIT_TEMPLATE;
+        var date = new Date();
+        editTemp.content.querySelector('.time-edit-news').textContent = date.toLocaleString("ru");
+        if (id) {
+            var article = articlesService.getArticle(id);
+
+            editTemp.content.querySelector('.id-edit-news').textContent = article.id;
+            editTemp.content.querySelector('.author-edit-news').textContent = article.author;
+            editTemp.content.querySelector('.title-edit-news').value = article.title;
+            editTemp.content.querySelector('.tags-edit-news').value = article.tag;
+            editTemp.content.querySelector('.summary-edit-news').textContent = article.summary;
+            editTemp.content.querySelector('.content-edit-news').textContent = article.content;
+        } else {
+            editTemp.content.querySelector('.id-edit-news').textContent = Date.now().toString();
+            editTemp.content.querySelector('.author-edit-news').textContent = user;
+            editTemp.content.querySelector('.title-edit-news').value = '';
+            editTemp.content.querySelector('.tags-edit-news').value = '';
+            editTemp.content.querySelector('.summary-edit-news').textContent = '';
+            editTemp.content.querySelector('.content-edit-news').textContent = '';
+        }
+        ARTICLE_LIST_NODE.appendChild(editTemp.content.querySelector('.edit-news-form').cloneNode(true));
+    }
+
+    function insertAddEditArticle() {
+        var date = new Date();
+        editOrAddArticle = articlesService.getNullArticle();
+
+        editOrAddArticle.id = document.querySelector('.id-edit-news').textContent;
+        editOrAddArticle.title = document.querySelector('.title-edit-news').value;
+        editOrAddArticle.summary = document.querySelector('.summary-edit-news').value;
+        editOrAddArticle.content = document.querySelector('.content-edit-news').value;
+        editOrAddArticle.author = user;
+        editOrAddArticle.tag = document.querySelector('.tags-edit-news').value;
+        editOrAddArticle.createdAt = date;
+
+        var flag = false;
+        if (articlesService.getArticle(editOrAddArticle.id)) {
+            articlesService.editArticle(editOrAddArticle.id, editOrAddArticle);
+            flag = true;
+        } else {
+            if (articlesService.validateArticle(editOrAddArticle)) {
+                insertArticleInDom(editOrAddArticle);
+                flag = true;
+            } else {
+                alert('Неверныый формат новости, попробуйте еще раз');
+            }
+        }
+        if (flag) {
+            ARTICLE_LIST_NODE.removeChild(document.querySelector('.edit-news-form'));
+            console.log(editOrAddArticle);
+            console.log(editOrAddArticle.id);
+            insertDetailedArticle(editOrAddArticle.id, 1);
+        }
+    }
+
+    function insertFilter() {
+        deletedFilter = controlPanel.removeChild(document.getElementById('filters'));
+        logNode.appendChild(FILTER_TEMPLATE.content.querySelector('.filter').cloneNode(true));
+        isOpenFilter = true;
+    }
+
+    function deleteFilter() {
+        if (deletedFilter) {
+            controlPanel.appendChild(deletedFilter);
+        }
+        if (isOpenFilter) {
+            logNode.removeChild(document.querySelector('.filter'));
+        }
+        isOpenFilter = false;
+    }
+
+    function applyFilter() {
+        filterConfig.author = document.getElementById('search-author').value;
+        filterConfig.dateStart = document.getElementById('search-date-with').value;
+        filterConfig.dateFinish = document.getElementById('search-date-to').value;
+        filterConfig.tag = document.getElementById('search-tags').value.split(', ');
+
+        deleteFilter();
+
+        var articles = articlesService.getArticles(0, 1000, filterConfig);
+        if (articles.length) {
+            removeArticlesFromDom();
+            articleRenderer.insertArticlesInDom(articles);
+        } else {
+            showError();
+        }
+    }
+
+    function showError() {
+        deleteFilter();
+        logNode.appendChild(ERROR_TEMPLATE.content.querySelector('.error-img').cloneNode(true));
+        isItError = true;
+        deleteMain();
+    }
+
     return {
         init: init,
         insertArticlesInDom: insertArticlesInDom,
         insertArticleInDom: insertArticleInDom,
-        editArticlesInDom: editArticleInDom,
+        editArticleInDom: editArticleInDom,
         removeArticlesFromDom: removeArticlesFromDom,
-        removeArticleFromDom: removeArticleFromDom
+        removeArticleFromDom: removeArticleFromDom,
+        removeArticleFromDomFromDetailed: removeArticleFromDomFromDetailed,
+        insertLogin: insertLogin,
+        logIn: logIn,
+        insertDetailedArticle: insertDetailedArticle,
+        insertMain: insertMain,
+        insertMainAfterLog: insertMainAfterLog,
+        insertEditFormArticle: insertEditFormArticle,
+        insertAddEditArticle: insertAddEditArticle,
+        insertFilter: insertFilter,
+        deleteFilter: deleteFilter,
+        showFilter: applyFilter
     };
 }());
 
-document.addEventListener('DOMContentLoaded', startApp);
+function addEventList() {
+    var mainPageElements = document.querySelector('.content');
+    var logElements = document.querySelector('.header');
 
-function startApp() {
-    articleRenderer.init();
-    renderArticles(0, 20);
+    mainPageElements.addEventListener('click', selectEventInArticle);
+    logElements.addEventListener('click', selectEvent);
 }
 
-function renderArticles(skip, top) {
+function selectEvent(event) {
+    var elemName = event.target.className;
+    if (!elemName) {
+        elemName = event.target.parentNode.className;
+    }
+
+    console.log(elemName);
+    switch (elemName) {
+        case 'log-in-action':
+            articleRenderer.insertLogin();
+            break;
+        case 'header-text':
+            articleRenderer.insertMainAfterLog();
+            break;
+    }
+}
+
+function selectEventInArticle(event) {
+    var eventClassName = event.target.className;
+    console.log(eventClassName);
+
+    switch (eventClassName) {
+        case 'delete-icon':
+            console.log(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            var articleToDelete = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            articleRenderer.removeArticleFromDom(articleToDelete);
+            break;
+        case 'delete-icon-detailed':
+            console.log(parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id')));
+            var articleToDeleteDet = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            articleRenderer.removeArticleFromDomFromDetailed(articleToDeleteDet);
+            break;
+        case 'article-list-item-title':
+            var articleToShowID = parseInt(event.target.parentElement.getAttribute('data-id'));
+            articleRenderer.insertDetailedArticle(articleToShowID);
+            break;
+        case 'button2':
+            articleRenderer.logIn();
+            break;
+        case 'to-main':
+            articleRenderer.insertMain();
+            break;
+        case 'edit-icon':
+            var articleToEditDet = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            articleRenderer.insertEditFormArticle(articleToEditDet);
+            break;
+        case 'edit-icon-detailed':
+            var articleToEditDetailed = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            articleRenderer.insertEditFormArticle(articleToEditDetailed);
+            break;
+        case 'button1':
+            articleRenderer.insertEditFormArticle();
+            break;
+        case 'button3':
+            articleRenderer.insertAddEditArticle();
+            break;
+        case 'button5':
+            articleRenderer.insertFilter();
+            break;
+        case 'button7':
+            articleRenderer.deleteFilter();
+            break;
+        case 'button6':
+            articleRenderer.showFilter();
+            break;
+    }
+
+}
+
+var pagination = (function () {
+    var total; // всего статей
+    var perPage = 10; // статей на 1-ой странице
+    var currentPage = 1; // текущая страница
+    var showMoreButton;
+    var showMoreCallback; // функция, которую вызывать, когда произошел клик по кнопке
+
+    /*
+     Total: Всего статей в ArticleModel. (Надо будет еще учесть, что total меняется при применении фильтров)
+     showMoreCb: функция, которую надо вызвать при клике на кнопку "Показать Еще"
+     */
+
+    function init(_total, showMoreCb) {
+        total = _total;
+        showMoreCallback = showMoreCb;
+        showMoreButton = document.querySelector('.more-news');
+        showMoreButton.addEventListener('click', handleShowMoreClick);
+
+
+        /* Не показывать кнопку если статей нет */
+        if (getTotalPages() <= currentPage) {
+            //hideShowMoreButton();
+        }
+
+        /* Вернуть skip, top для начальной отрисовки статей */
+        return getParams();
+    }
+
+    function handleShowMoreClick() {
+        var paginationParams = nextPage();
+        showMoreCallback(paginationParams.skip, paginationParams.top);
+    }
+
+    function getTotalPages() {
+        return Math.ceil(total / perPage);
+    }
+
+    function nextPage() {
+        currentPage++;
+        if (getTotalPages() <= currentPage) {
+            hideShowMoreButton();
+        }
+
+        return getParams();
+    }
+
+    function getParams() {
+        return {
+            top: perPage,
+            skip: (currentPage - 1) * perPage
+        };
+    }
+
+    function hideShowMoreButton() {
+        showMoreButton.style.display = 'none';
+    }
+
+    return {
+        init: init
+    }
+
+}());
+
+document.addEventListener('DOMContentLoaded', startAppFirst);
+addEventList();
+
+function startAppFirst() {
+    articleRenderer.init();
+    startAppSecond();
+}
+
+function startAppSecond() {
+    pagination.init(articlesService.getArticlesSize(), function (skip, top) {
+        renderArticlesWithPagination(skip, top);
+    });
+    renderArticlesWithPagination(pagination.skip, pagination.top);
+}
+
+function renderArticlesWithPagination(skip, top) {
     var articles = articlesService.getArticles(skip, top);
 
     articleRenderer.insertArticlesInDom(articles);
-
-    articleRenderer.insertArticleInDom({
-        id: "21",
-        title: "Добавленный пост",
-        summary: "Добавленный пост из insertArticleInDom ",
-        createdAt: new Date('2017-02-22T20:31:00'),
-        author: "Andrew",
-        content: "content",
-        tag: ["Минск"]
-    });
-
-    // articleRenderer.editArticlesInDom("6",{
-    //     author: 1234,
-    //     content: 'New content из editArticlesInDom'
-    // });
-
-
 }
