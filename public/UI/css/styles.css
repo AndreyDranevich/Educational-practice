@@ -1,0 +1,532 @@
+body, html {
+    font-family: Arial;
+    height: 100%;
+    margin: 0;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 300px;
+}
+
+.main-margin {
+    margin: 0 15% 0 15%;
+}
+
+.control-panel-1 {
+    width: 100%;
+    float: left;
+    border: 3px solid white;
+}
+
+.control-panel-2 {
+    width: 100%;
+    float: left;
+    border: 3px solid white;
+}
+
+.search {
+    width: 220px;
+    float: right;
+}
+
+.header-text {
+    background-color: green;
+    color: lightcyan;
+    text-align: center;
+    padding: 10px;
+    margin: 0 0 5px 0;
+}
+
+.up-buttons {
+    margin: 0;
+    padding: 4px;
+}
+
+ul.up-buttons li {
+    display: inline;
+    margin-right: 5px;
+    padding: 3px;
+    font-size: 20px;
+}
+
+.content-main {
+    background: lightcyan;
+}
+
+.content-main:hover, .back:hover {
+    border: 3px solid green;
+}
+
+.center {
+    margin: 0;
+    font-size: 14px;
+    text-align: left;
+    color: black;
+    padding: 5px;
+}
+
+.back {
+    background-color: lightcyan;
+    height: 250px;
+}
+
+.footer {
+    background: green;
+    color: lightcyan;
+    text-align: center;
+    margin-top: 5px;
+    height: 55px;
+    flex: 0 0 auto;
+}
+
+.header-news {
+    padding: 5px;
+    text-align: left;
+    font-size: 16px;
+    color: black;
+    font-weight: bold;
+}
+
+.article-list-item-title {
+    padding: 5px;
+    text-align: left;
+    font-size: 16px;
+    color: black;
+    font-weight: bold;
+}
+
+img {
+    height: auto;
+    width: 100%;
+}
+
+.edit-icon, .delete-icon, .delete-icon-detailed, .edit-icon-detailed {
+    height: 20px;
+    width: 20px;
+    float: left;
+    cursor: pointer;
+}
+
+.author {
+    font-style: italic;
+    color: lightslategrey;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.float-right {
+    float: right;
+}
+
+.tags {
+    margin: 2px 0 0 0;
+    color: lightslategrey;
+    text-decoration: none;
+}
+
+p {
+    margin-top: 5px;
+    margin-bottom: 5px;;
+}
+
+.add-edit-news-header {
+    text-align: center;
+}
+
+div.edit-news-form p {
+    font-size: 20px;
+    font-style: inherit;
+}
+
+textarea {
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 6px 10px 6px 10px;
+    width: 100%;
+    min-height: 150px;
+    max-width: 100%;
+}
+
+div.edit-news-form input {
+    width: 100%;
+}
+
+.col-1 {
+    width: 8.33%;
+}
+
+.col-2 {
+    width: 16.66%;
+}
+
+.col-3 {
+    width: 25%;
+}
+
+.col-4 {
+    width: 33.33%;
+}
+
+.col-5 {
+    width: 41.66%;
+}
+
+.col-6 {
+    width: 50%;
+}
+
+.col-7 {
+    width: 58.33%;
+}
+
+.col-8 {
+    width: 66.66%;
+}
+
+.col-9 {
+    width: 75%;
+}
+
+.col-10 {
+    width: 83.33%;
+}
+
+.col-11 {
+    width: 91.66%;
+}
+
+.col-12 {
+    width: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+[class*="col-"] {
+    float: left;
+    border: 3px solid white;
+
+}
+
+input[type=text] {
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 10px 6px 10px;
+}
+
+.button1 {
+    background-color: green;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    cursor: pointer;
+    padding: 6px 10px 6px 10px;
+    font-size: 12px;
+    float: right;
+    border: 2px solid white;
+    margin-left: 2px;
+}
+
+.button2, .button6,.button7 {
+    background-color: green;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    padding: 6px 10px 6px 10px;
+    font-size: 12px;
+    border: 2px solid white;
+    margin-left: 30%;
+    margin-right: 30%;
+    width: 40%;
+}
+
+.button3 {
+    background-color: green;
+    width: 40%;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    padding: 6px 10px 6px 10px;
+    font-size: 12px;
+    margin-left: 30%;
+    margin-right: 30%;
+    border: 2px solid white;
+}
+
+.button4, .button5 {
+    background-color: green;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    cursor: pointer;
+    padding: 6px 10px 6px 10px;
+    font-size: 12px;
+    float: right;
+    border: 2px solid white;
+    margin-left: 2px;
+}
+
+.button1:hover, .button2:hover, .button3:hover, .button4:hover, .button5:hover, .button6:hover,.button7:hover {
+    border: 2px solid green;
+}
+
+div.relative {
+    position: relative;
+}
+
+div.absolute {
+    position: absolute;
+    top: 0;
+    right: 60px;
+    width: 200px;
+    height: 100px;
+    border: 3px green;
+    color: lightcyan;
+}
+
+.profile {
+    margin: 32px 10px 5px 0;
+    float: right;
+}
+
+.log-in-action {
+    margin-left: 95px;
+    margin-top: 10px;
+    text-decoration: none;
+    color: lightcyan;
+    cursor: pointer;
+}
+
+.log-in-action:hover {
+    color: black;
+}
+
+.authorization {
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 10px 6px 10px;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+}
+
+.filter-date {
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 10px 6px 10px;
+    margin-left: 0;
+    margin-right: 0;
+    width: 30%;
+}
+
+.slideDown {
+    animation-name: slideDown;
+    animation-duration: 0.5s;
+    animation-timing-function: ease;
+
+    visibility: visible !important;
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(-10%)
+    }
+}
+
+.user-logo {
+    float: right;
+    height: 50px;
+    width: 50px;
+    margin: 23px 0 0 0;
+    border-radius: 50px;
+    border: 1px solid black;
+}
+
+.advanced-search {
+    margin-right: 200px;
+    float: right;
+    font-size: 12px;
+    text-decoration: none;
+    color: blue;
+}
+
+.more-news {
+    text-decoration: none;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+.to-main {
+    cursor: pointer;
+}
+
+.control-buttons {
+    position: absolute;
+    bottom: 5px;
+}
+
+.error-img {
+    border-top: 30px;
+    margin-left: 25%;
+    padding-bottom: 60px;
+}
+
+.detailed-news {
+    min-height: 200px;
+}
+
+.header-news-detailed {
+    text-align: center;
+    font-size: 28px;
+    color: black;
+    font-weight: bold;
+}
+
+.author-detailed-news {
+    font-style: italic;
+    color: lightslategrey;
+    float: right;
+}
+
+.content {
+    flex: 1 0 auto;
+    margin: 0 15% 0 15%;
+}
+
+.header {
+    display: table-row;
+}
+
+.article-list-item {
+    animation: appear-animation 1s cubic-bezier(0.17, 0.67, 0.48, 1.28) forwards;
+}
+
+.log-list-item {
+    margin-left: 30%;
+    margin-right: 30%;
+    width: 40%;
+    padding: 10px;
+    animation: appear-animation 0.7s cubic-bezier(0.25, 0.1, 0.25, 1.0) forwards;
+}
+
+.detailed-news {
+    animation: appear-animation 0.7s cubic-bezier(0, 0, 0.58, 1.0) forwards;
+}
+
+.edit-news-form {
+    animation: appear-animation 0.7s cubic-bezier(0, 0, 0.58, 1.0) forwards;
+}
+
+@keyframes appear-animation {
+    0% {
+        opacity: 0.5;
+        transform: translateY(600px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    [class*="col-"] {
+        width: 50%;
+    }
+
+    .col-12 {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 750px) {
+    [class*="col-"] {
+        width: 50%;
+    }
+
+    .col-12 {
+        width: 100%;
+    }
+
+    .content {
+        margin: 0 5% 0 5%;
+    }
+
+    div.absolute {
+        right: 0;
+    }
+
+    .header-text {
+        text-align: left;
+    }
+
+    ul.up-buttons li {
+        padding: 0;
+    }
+
+    .user-logo {
+        margin: 23px auto;
+    }
+
+}
+
+@media only screen and (max-width: 500px) {
+    [class*="col-"] {
+        width: 100%;
+    }
+
+    input[type=text] {
+        width: 100%;
+    }
+
+    .advanced-search {
+        margin-right: 0;
+        float: none;
+    }
+
+    .button1 {
+        width: 30%;
+        float: right;
+    }
+
+    .header-text {
+        text-align: left;
+    }
+
+    .button2 {
+        float: right;
+    }
+
+    ul.up-buttons li {
+        padding: 0;
+        font-size: 12px;
+    }
+
+    div.absolute {
+        width: 170px;
+    }
+
+    .error-img {
+        margin: 0;
+    }
+
+    .log-list-item {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .user-logo {
+        margin: auto;
+    }
+}
