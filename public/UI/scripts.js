@@ -1,7 +1,7 @@
-var user = 'Andrew';
+let user = 'Andrew';
 
-var articlesService = (function () {
-    var articles = [
+let articlesService = (function () {
+    let articles = [
         {
             id: '1',
             title: 'На торгах 6 марта рубль окреп только к долларy',
@@ -185,7 +185,7 @@ var articlesService = (function () {
         }
     ];
 
-    var all_tags = ['доллар', 'политика', 'Лукашенко', 'AЭС', 'Польша', 'экономика', 'деньги', 'Газпром', 'Минск', 'автобусы', 'Мкад-2', 'дороги'];
+    let all_tags = ['доллар', 'политика', 'Лукашенко', 'AЭС', 'Польша', 'экономика', 'деньги', 'Газпром', 'Минск', 'автобусы', 'Мкад-2', 'дороги'];
 
     function getArticles(skip, top, filterConfig) {
         skip = skip || 0;
@@ -194,7 +194,7 @@ var articlesService = (function () {
             top = articles.length;
         }
 
-        var newArticles = [];
+        let newArticles = [];
         if (filterConfig) {
             newArticles = getArticlesByFilter(filterConfig);
         } else {
@@ -206,10 +206,10 @@ var articlesService = (function () {
     }
 
     function getArticlesByFilter(filterConfig) {
-        var filteredArray = [];
-        for (var i = 0; i < articles.length; i++) {
+        let filteredArray = [];
+        for (let i = 0; i < articles.length; i++) {
             if (filterConfig.dateStart && filterConfig.dateFinish) {
-                if (compareDate(filterConfig.dateStart, articles[i].createdAt) && compareDate(articles[i].createdAt, filterConfig.dateFinish)) {
+                if (compareDate(filterConfig.dateStart, convertDate(articles[i].createdAt)) && compareDate(convertDate(articles[i].createdAt), filterConfig.dateFinish)) {
                     filteredArray.push(articles[i]);
                 }
             }
@@ -219,7 +219,7 @@ var articlesService = (function () {
                 }
             }
             if (filterConfig.tag) {
-                for (var j = 0; j < filterConfig.tag.length; j++) {
+                for (let j = 0; j < filterConfig.tag.length; j++) {
                     if (articles[i].tag.indexOf(filterConfig.tag[j]) != -1) {
                         filteredArray.push(articles[i]);
                     }
@@ -229,12 +229,16 @@ var articlesService = (function () {
         return filteredArray;
     }
 
+    function convertDate(a) {
+        return a.getFullYear() + '-' + (a.getMonth() < 10 ? '0' : '') + a.getMonth() + '-' + a.getDate();
+    }
+
     function compareDate(a, b) {
-        return a.createdAt > b.createdAt ? -1 : 1;
+        return a.createdAt > b.createdAt ? 1 : -1;
     }
 
     function getArticle(id) {
-        for (var i = 0; i < articles.length; i++) {
+        for (let i = 0; i < articles.length; i++) {
             if (articles[i].id == id) {
                 return articles[i];
             }
@@ -265,7 +269,7 @@ var articlesService = (function () {
         if (!article) {
             return false;
         }
-        for (var i = 0; i < articles.length; i++) {
+        for (let i = 0; i < articles.length; i++) {
             if (articles[i].id == id) {
                 if (article.title && article.title.length < 100) {
                     articles[i].title = article.title;
@@ -285,7 +289,7 @@ var articlesService = (function () {
 
 
     function removeArticle(id) {
-        for (var i = 0; i < articles.length; i++) {
+        for (let i = 0; i < articles.length; i++) {
             if (articles[i].id == id) {
                 articles.splice(i, 1);
                 fillArticlesStorage();
@@ -317,7 +321,7 @@ var articlesService = (function () {
     }
 
     function getNullArticle() {
-        var nullArticle = {
+        return {
             id: '',
             title: '',
             summary: '',
@@ -326,7 +330,6 @@ var articlesService = (function () {
             author: '',
             content: ''
         };
-        return nullArticle;
     }
 
     function fillArticlesStorage() {
@@ -334,7 +337,7 @@ var articlesService = (function () {
         localStorage.setItem('articlesKey', JSON.stringify(articles));
     }
 
-    var articlesData = JSON.parse(localStorage.getItem('articlesKey'));
+    let articlesData = JSON.parse(localStorage.getItem('articlesKey'));
     if (!articlesData)
         fillArticlesStorage();
     else {
@@ -362,35 +365,35 @@ var articlesService = (function () {
     }
 }());
 
-var filterConfig = {
+let filterConfig = {
     author: 'name',
     dateStart: 10,
     dateFinish: 12,
     tag: ['df', 'hello']
 };
 
-var articleRenderer = (function () {
-    var ARTICLE_TEMPLATE;
-    var LOG_TEMPLATE;
-    var DETAILED_ARTICLE_TEMPLATE;
-    var EDIT_TEMPLATE;
-    var FILTER_TEMPLATE;
-    var ERROR_TEMPLATE;
+let articleRenderer = (function () {
+    let ARTICLE_TEMPLATE;
+    let LOG_TEMPLATE;
+    let DETAILED_ARTICLE_TEMPLATE;
+    let EDIT_TEMPLATE;
+    let FILTER_TEMPLATE;
+    let ERROR_TEMPLATE;
 
-    var ARTICLE_LIST_NODE;
-    var CONTENT;
-    var controlPanel;
-    var logNode;
-    var blockWithSearch;
-    var editOrAddArticle;
+    let ARTICLE_LIST_NODE;
+    let CONTENT;
+    let controlPanel;
+    let logNode;
+    let blockWithSearch;
+    let editOrAddArticle;
 
-    var isOpenFilter = false;
-    var isItError = false;
-    var deletedFilter;
-    var deletedAddButton;
-    var deletedControlButtons;
-    var deletedBlockSearch;
-    var deletedMoreNews;
+    let isOpenFilter = false;
+    let isItError = false;
+    let deletedFilter;
+    let deletedAddButton;
+    let deletedControlButtons;
+    let deletedBlockSearch;
+    let deletedMoreNews;
 
     function init() {
         ARTICLE_TEMPLATE = document.querySelector('#template-article-list-item');
@@ -410,7 +413,7 @@ var articleRenderer = (function () {
 
     function insertArticlesInDom(articles) {
         loadUser(user);
-        var articlesNodes = renderArticles(articles);
+        let articlesNodes = renderArticles(articles);
         articlesNodes.forEach(function (node) {
             ARTICLE_LIST_NODE.appendChild(node);
         });
@@ -435,7 +438,7 @@ var articleRenderer = (function () {
         articlesService.removeArticle(id);
 
         removeArticlesFromDom();
-        var articles = articlesService.getArticles(0, 10);
+        let articles = articlesService.getArticles(0, 10);
         insertArticlesInDom(articles);
     }
 
@@ -451,7 +454,7 @@ var articleRenderer = (function () {
     }
 
     function renderArticle(article) {
-        var template = ARTICLE_TEMPLATE;
+        let template = ARTICLE_TEMPLATE;
         template.content.querySelector('.article-list-item').dataset.id = article.id;
         template.content.querySelector('.article-list-item-title').textContent = article.title;
         template.content.querySelector('.article-list-item-summary').textContent = article.summary;
@@ -459,7 +462,7 @@ var articleRenderer = (function () {
         template.content.querySelector('.article-list-item-tags').textContent = article.tag;
         template.content.querySelector('.article-list-item-date').textContent = formatDate(article.createdAt);
 
-        var controlButtons = template.content.querySelector(".control-buttons");
+        let controlButtons = template.content.querySelector(".control-buttons");
         if (!user) {
             if (controlButtons) {
                 deletedControlButtons = template.content.querySelector(".block-of-buttons").removeChild(controlButtons);
@@ -475,7 +478,7 @@ var articleRenderer = (function () {
     }
 
     function loadUser(user) {
-        var addArticleButton = document.getElementById("add-button");
+        let addArticleButton = document.getElementById("add-button");
         if (user) {
             document.querySelector(".profile").textContent = "Привет, " + user + "!";
             document.querySelector(".log-in-action").textContent = "Выход";
@@ -511,8 +514,8 @@ var articleRenderer = (function () {
     }
 
     function logIn() {
-        var inputName = document.querySelector('.name-event').value;
-        var inputPassword = document.querySelector('.password-event').value;
+        let inputName = document.querySelector('.name-event').value;
+        let inputPassword = document.querySelector('.password-event').value;
 
         if (isCorrectLogin(inputName, inputPassword)) {
             user = inputName;
@@ -564,8 +567,8 @@ var articleRenderer = (function () {
     function insertDetailedArticle(articleID, flag) {
         flag = flag || 0;
         removeArticlesFromDom();
-        var article = articlesService.getArticle(articleID);
-        var detailedTemp = DETAILED_ARTICLE_TEMPLATE;
+        let article = articlesService.getArticle(articleID);
+        let detailedTemp = DETAILED_ARTICLE_TEMPLATE;
 
         detailedTemp.content.querySelector('.detailed-news').dataset.id = article.id;
         detailedTemp.content.querySelector('.header-news-detailed').textContent = article.title;
@@ -590,11 +593,11 @@ var articleRenderer = (function () {
     function insertEditFormArticle(id) {
         deleteMain();
         deleteFilter();
-        var editTemp = EDIT_TEMPLATE;
-        var date = new Date();
+        let editTemp = EDIT_TEMPLATE;
+        let date = new Date();
         editTemp.content.querySelector('.time-edit-news').textContent = date.toLocaleString("ru");
         if (id) {
-            var article = articlesService.getArticle(id);
+            let article = articlesService.getArticle(id);
 
             editTemp.content.querySelector('.id-edit-news').textContent = article.id;
             editTemp.content.querySelector('.author-edit-news').textContent = article.author;
@@ -614,7 +617,7 @@ var articleRenderer = (function () {
     }
 
     function insertAddEditArticle() {
-        var date = new Date();
+        let date = new Date();
         editOrAddArticle = articlesService.getNullArticle();
 
         editOrAddArticle.id = document.querySelector('.id-edit-news').textContent;
@@ -622,10 +625,10 @@ var articleRenderer = (function () {
         editOrAddArticle.summary = document.querySelector('.summary-edit-news').value;
         editOrAddArticle.content = document.querySelector('.content-edit-news').value;
         editOrAddArticle.author = user;
-        editOrAddArticle.tag = document.querySelector('.tags-edit-news').value;
+        editOrAddArticle.tag = document.querySelector('.tags-edit-news').value.split(', ');
         editOrAddArticle.createdAt = date;
 
-        var flag = false;
+        let flag = false;
         if (articlesService.getArticle(editOrAddArticle.id)) {
             articlesService.editArticle(editOrAddArticle.id, editOrAddArticle);
             flag = true;
@@ -667,8 +670,8 @@ var articleRenderer = (function () {
 
         deleteFilter();
 
-        var articles = articlesService.getArticles(0, 1000, filterConfig);
-        if (articles.length) {
+        let articles = articlesService.getArticles(0, 1000, filterConfig);
+        if (articles.length - 1) {
             removeArticlesFromDom();
             articleRenderer.insertArticlesInDom(articles);
         } else {
@@ -705,15 +708,15 @@ var articleRenderer = (function () {
 }());
 
 function addEventList() {
-    var mainPageElements = document.querySelector('.content');
-    var logElements = document.querySelector('.header');
+    let mainPageElements = document.querySelector('.content');
+    let logElements = document.querySelector('.header');
 
     mainPageElements.addEventListener('click', selectEventInArticle);
     logElements.addEventListener('click', selectEvent);
 }
 
 function selectEvent(event) {
-    var elemName = event.target.className;
+    let elemName = event.target.className;
     if (!elemName) {
         elemName = event.target.parentNode.className;
     }
@@ -729,19 +732,19 @@ function selectEvent(event) {
 }
 
 function selectEventInArticle(event) {
-    var eventClassName = event.target.className;
+    let eventClassName = event.target.className;
 
     switch (eventClassName) {
         case 'delete-icon':
-            var articleToDelete = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            let articleToDelete = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
             articleRenderer.removeArticleFromDom(articleToDelete);
             break;
         case 'delete-icon-detailed':
-            var articleToDeleteDet = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            let articleToDeleteDet = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
             articleRenderer.removeArticleFromDomFromDetailed(articleToDeleteDet);
             break;
         case 'article-list-item-title':
-            var articleToShowID = parseInt(event.target.parentElement.getAttribute('data-id'));
+            let articleToShowID = parseInt(event.target.parentElement.getAttribute('data-id'));
             articleRenderer.insertDetailedArticle(articleToShowID);
             break;
         case 'button2':
@@ -751,11 +754,11 @@ function selectEventInArticle(event) {
             articleRenderer.insertMain();
             break;
         case 'edit-icon':
-            var articleToEditDet = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            let articleToEditDet = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
             articleRenderer.insertEditFormArticle(articleToEditDet);
             break;
         case 'edit-icon-detailed':
-            var articleToEditDetailed = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
+            let articleToEditDetailed = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
             articleRenderer.insertEditFormArticle(articleToEditDetailed);
             break;
         case 'button1':
@@ -777,12 +780,12 @@ function selectEventInArticle(event) {
 
 }
 
-var pagination = (function () {
-    var total; // всего статей
-    var perPage = 10; // статей на 1-ой странице
-    var currentPage = 1; // текущая страница
-    var showMoreButton;
-    var showMoreCallback; // функция, которую вызывать, когда произошел клик по кнопке
+let pagination = (function () {
+    let total; // всего статей
+    let perPage = 10; // статей на 1-ой странице
+    let currentPage = 1; // текущая страница
+    let showMoreButton;
+    let showMoreCallback; // функция, которую вызывать, когда произошел клик по кнопке
 
     /*
      Total: Всего статей в ArticleModel. (Надо будет еще учесть, что total меняется при применении фильтров)
@@ -806,7 +809,7 @@ var pagination = (function () {
     }
 
     function handleShowMoreClick() {
-        var paginationParams = nextPage();
+        let paginationParams = nextPage();
         showMoreCallback(paginationParams.skip, paginationParams.top);
     }
 
@@ -856,7 +859,7 @@ function startAppSecond() {
 }
 
 function renderArticlesWithPagination(skip, top) {
-    var articles = articlesService.getArticles(skip, top);
+    let articles = articlesService.getArticles(skip, top);
 
     articleRenderer.insertArticlesInDom(articles);
 }
