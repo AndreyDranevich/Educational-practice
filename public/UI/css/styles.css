@@ -38,11 +38,13 @@ body, html {
     text-align: center;
     padding: 10px;
     margin: 0 0 5px 0;
+    cursor: pointer;
 }
 
 .up-buttons {
     margin: 0;
     padding: 4px;
+    cursor: default;
 }
 
 ul.up-buttons li {
@@ -96,6 +98,7 @@ ul.up-buttons li {
     font-size: 16px;
     color: black;
     font-weight: bold;
+    cursor: pointer;
 }
 
 img {

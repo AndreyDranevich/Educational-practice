@@ -1,7 +1,7 @@
 {
   "name": "WLNews",
   "version": "1.0.0",
-  "description": "hello world",
+  "description": "",
   "main": "script.js",
   "scripts": {
     "test": "test"
@@ -10,9 +10,6 @@
     "type": "git",
     "url": "git+https://github.com/AndreyDranevich/Educational-practice.git"
   },
-  "keywords": [
-    "andrew"
-  ],
   "author": "Andrew Dranevich",
   "license": "ISC",
   "bugs": {
@@ -20,6 +17,8 @@
   },
   "homepage": "https://github.com/AndreyDranevich/Educational-practice#readme",
   "dependencies": {
+    "body-parser": "^1.17.2",
+    "diskdb": "^0.1.17",
     "express": "^4.15.2"
   }
 }
