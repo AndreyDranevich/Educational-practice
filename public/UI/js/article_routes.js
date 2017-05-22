@@ -5,7 +5,7 @@ let article_routes = (function () {
         req.open('GET', '/article/' + id, false);
         req.setRequestHeader('content-type', 'application/json');
         req.send();
-        console.log(JSON.parse(req.responseText));
+
         const article = JSON.parse(req.responseText);
         article.createdAt = new Date(article.createdAt);
         return article;
@@ -15,7 +15,6 @@ let article_routes = (function () {
         req.open('GET', '/articles', false);
         req.setRequestHeader('content-type', 'application/json');
         req.send();
-
         const articles = JSON.parse(req.responseText);
         articles.forEach((currentArticle) => {
             currentArticle.createdAt = new Date(currentArticle.createdAt);

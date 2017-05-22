@@ -12,6 +12,7 @@ let articlesService = (function () {
             top = articles.length;
         }
 
+        articles = article_routes.getArticles().slice();
         let newArticles = [];
         if (filterConfig) {
             newArticles = getArticlesByFilter(filterConfig);
@@ -218,6 +219,7 @@ let articleRenderer = (function () {
 
     let isOpenFilter = false;
     let isItError = false;
+    let isNewArticle = true;
     let deletedFilter;
     let deletedAddButton;
     let deletedControlButtons;
@@ -435,6 +437,7 @@ let articleRenderer = (function () {
             editTemp.content.querySelector('.summary-edit-news').textContent = article.summary;
             editTemp.content.querySelector('.content-edit-news').textContent = article.content;
         } else {
+            isNewArticle = true;
             editTemp.content.querySelector('.id-edit-news').textContent = Date.now().toString();
             editTemp.content.querySelector('.author-edit-news').textContent = user;
             editTemp.content.querySelector('.title-edit-news').value = '';
@@ -458,7 +461,8 @@ let articleRenderer = (function () {
         editOrAddArticle.createdAt = date;
 
         let flag = false;
-        if (articlesService.getArticle(editOrAddArticle.id)) {
+
+        if (!isNewArticle) {
             articlesService.editArticle(editOrAddArticle.id, editOrAddArticle);
             flag = true;
         } else {
@@ -562,7 +566,6 @@ function selectEvent(event) {
 
 function selectEventInArticle(event) {
     let eventClassName = event.target.className;
-
     switch (eventClassName) {
         case 'delete-icon':
             let articleToDelete = parseInt(event.target.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id'));
