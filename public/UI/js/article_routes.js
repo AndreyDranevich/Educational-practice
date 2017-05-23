@@ -2,7 +2,7 @@ const articleRoutes = (function get() {
   const req = new XMLHttpRequest();
 
   function getArticle(id) {
-    req.open('GET', '/article/' + id, false);
+    req.open('GET', `/article/${id}`, false);
     req.setRequestHeader('content-type', 'application/json');
     req.send();
 
@@ -23,13 +23,12 @@ const articleRoutes = (function get() {
   }
 
   function editArticle(id, article) {
-    req.open('PUT', '/article/' + id, false);
+    req.open('PUT', `/article/${id}`, false);
     req.setRequestHeader('content-type', 'application/json');
     req.onerror = function () {
       reject(new Error('Error'));
     };
     req.send(JSON.stringify(article));
-
   }
 
   function addArticle(article) {
@@ -42,7 +41,7 @@ const articleRoutes = (function get() {
   }
 
   function deleteArticle(id) {
-    req.open('DELETE', '/articles/' + id, false);
+    req.open('DELETE', `/articles/${id}`, false);
     req.setRequestHeader('content-type', 'application/json');
     req.onerror = function () {
       reject(new Error('Error'));
